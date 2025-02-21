@@ -3,7 +3,7 @@ package model
 import "gorm.io/gorm"
 
 type Report struct {
-	ID          uint   `gorm:"primaryKey"`
+	// ID          uint   `gorm:"primaryKey"`
 	UserID      uint   `gorm:"not null"`
 	Title       string `gorm:"type:varchar(150);not null"`
 	Description string `gorm:"type:text"`

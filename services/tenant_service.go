@@ -10,7 +10,7 @@ type TenantService interface {
 	FindByID(id int) (*model.Tenant, error)
 	CreateTenant(tenant *model.Tenant) error
 	UpdateTenant(tenant *model.Tenant) error
-	DeleteTenant(tenant *model.Tenant) error
+	DeleteTenant(id int) error
 }
 
 type tenantService struct {
@@ -27,8 +27,8 @@ func (s *tenantService) CreateTenant(tenant *model.Tenant) error {
 }
 
 // DeleteTenant implements TenantService.
-func (s *tenantService) DeleteTenant(tenant *model.Tenant) error {
-	result := s.tenantRepository.DeleteTenant(tenant)
+func (s *tenantService) DeleteTenant(id int) error {
+	result := s.tenantRepository.DeleteTenant(id)
 	if result != nil {
 		return result
 	}

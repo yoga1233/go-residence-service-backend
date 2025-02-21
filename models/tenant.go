@@ -3,7 +3,7 @@ package model
 import "gorm.io/gorm"
 
 type Tenant struct {
-	ID          int    `json:"id" gorm:"primaryKey;autoIncrement;not null;unique"`
+	// Id          int    `json:"id" gorm:"primaryKey;autoIncrement;not null;unique"`
 	Name        string `json:"name" gorm:"not null"`
 	Description string `json:"description" gorm:"not null"`
 	Price       int    `json:"price" gorm:"not null"`

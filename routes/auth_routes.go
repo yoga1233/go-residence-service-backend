@@ -20,16 +20,17 @@ func AuthRoutes(app *fiber.App) {
 	auth.Post("/register", func(c *fiber.Ctx) error {
 		user := new(model.User)
 		if err := c.BodyParser(user); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": "invalid request",
-			})
+			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
+		}
+
+		err := utils.Validate(user)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
 		}
 		if err := authService.Register(user); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
 		}
-		return c.JSON(fiber.Map{
-			"message": "user created",
-		})
+		return c.JSON(response.ApiResponseSuccess("user created", fiber.StatusOK, []string{}))
 	})
 
 	auth.Post("/login", func(c *fiber.Ctx) error {
@@ -49,13 +50,9 @@ func AuthRoutes(app *fiber.App) {
 
 		userResponse, err := authService.Login(login.Email, login.Password)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": err.Error(),
-			})
+			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
 		}
-		return c.JSON(fiber.Map{
-			"data": userResponse,
-		})
+		return c.JSON(response.ApiResponseSuccess("login success", fiber.StatusOK, userResponse))
 	})
 
 }

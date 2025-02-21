@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/yoga1233/go-residence-service-backend/config"
 	"github.com/yoga1233/go-residence-service-backend/middleware"
@@ -28,18 +30,40 @@ func TenantRoutes(app *fiber.App) {
 	app.Post("/tenant", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
 		tenant := new(model.Tenant)
 		if err := c.BodyParser(tenant); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": "invalid request",
-			})
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
 		}
 		if err := tenantService.CreateTenant(tenant); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": err.Error(),
-			})
+			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure("cannot create tenant", fiber.StatusBadRequest))
 		}
 		return c.JSON(fiber.Map{
 			"message": "tenant created",
 		})
+	})
+
+	app.Delete("/tenant/:id", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
+		}
+		if err := tenantService.DeleteTenant(id); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": err.Error(),
+			})
+		}
+		return c.JSON(response.ApiResponseSuccess("tenant deleted", fiber.StatusOK, []string{}))
+	})
+
+	app.Patch("/tenant", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		tenant := new(model.Tenant)
+		if err := c.BodyParser(tenant); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
+		}
+		if err := tenantService.UpdateTenant(tenant); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure("cannot update tenant", fiber.StatusBadRequest))
+		}
+		return c.JSON(response.ApiResponseSuccess("tenant updated", fiber.StatusOK, []string{}))
 	})
 
 }

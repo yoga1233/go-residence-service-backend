@@ -17,6 +17,7 @@ func main() {
 
 	routes.AuthRoutes(app)
 	routes.TenantRoutes(app)
+	routes.NewsRoutes(app)
 
 	log.Println("Server is running on http://localhost:3000")
 	app.Listen(":3000")

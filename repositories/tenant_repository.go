@@ -10,7 +10,7 @@ type TenantRepository interface {
 	FindByID(id int) (*model.Tenant, error)
 	CreateTenant(tenant *model.Tenant) error
 	UpdateTenant(tenant *model.Tenant) error
-	DeleteTenant(tenant *model.Tenant) error
+	DeleteTenant(id int) error
 }
 
 type tenantRepository struct {
@@ -23,8 +23,8 @@ func (s *tenantRepository) CreateTenant(tenant *model.Tenant) error {
 }
 
 // DeleteService implements TenantRepository.
-func (s *tenantRepository) DeleteTenant(tenant *model.Tenant) error {
-	result := s.db.Delete(&tenant)
+func (s *tenantRepository) DeleteTenant(id int) error {
+	result := s.db.Where("id = ?", id).Delete(&model.Tenant{})
 	if result.Error != nil {
 		return result.Error
 	}
@@ -35,7 +35,7 @@ func (s *tenantRepository) DeleteTenant(tenant *model.Tenant) error {
 // FindAll implements TenantRepository.
 func (s *tenantRepository) FindAll() ([]*model.Tenant, error) {
 	var t []*model.Tenant
-	result := s.db.Find(&t).Order("id ASC")
+	result := s.db.Where("status = ?", "available").Find(&t).Order("id ASC")
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -57,12 +57,7 @@ func (s tenantRepository) FindByID(id int) (*model.Tenant, error) {
 func (s *tenantRepository) UpdateTenant(tenant *model.Tenant) error {
 	var r model.Tenant
 
-	result := s.db.Where("id = ?", tenant.ID).First(&r)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	result = s.db.Model(&r).Updates(tenant)
+	result := s.db.Model(&r).Where("id = ?", tenant.ID).Updates(tenant)
 	if result.Error != nil {
 		return result.Error
 	}
