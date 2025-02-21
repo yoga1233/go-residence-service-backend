@@ -8,9 +8,9 @@ import (
 type TenantRepository interface {
 	FindAll() ([]*model.Tenant, error)
 	FindByID(id int) (*model.Tenant, error)
-	CreateService(service *model.Tenant) error
-	UpdateService(service *model.Tenant) error
-	DeleteService(service *model.Tenant) error
+	CreateTenant(tenant *model.Tenant) error
+	UpdateTenant(tenant *model.Tenant) error
+	DeleteTenant(tenant *model.Tenant) error
 }
 
 type tenantRepository struct {
@@ -18,13 +18,13 @@ type tenantRepository struct {
 }
 
 // CreateService implements TenantRepository.
-func (s *tenantRepository) CreateService(service *model.Tenant) error {
-	return s.db.Create(&service).Error
+func (s *tenantRepository) CreateTenant(tenant *model.Tenant) error {
+	return s.db.Create(&tenant).Error
 }
 
 // DeleteService implements TenantRepository.
-func (s *tenantRepository) DeleteService(service *model.Tenant) error {
-	result := s.db.Delete(&service)
+func (s *tenantRepository) DeleteTenant(tenant *model.Tenant) error {
+	result := s.db.Delete(&tenant)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -34,35 +34,35 @@ func (s *tenantRepository) DeleteService(service *model.Tenant) error {
 
 // FindAll implements TenantRepository.
 func (s *tenantRepository) FindAll() ([]*model.Tenant, error) {
-	var services []*model.Tenant
-	result := s.db.Find(&services).Order("id ASC")
+	var t []*model.Tenant
+	result := s.db.Find(&t).Order("id ASC")
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return services, nil
+	return t, nil
 }
 
 // FindByID implements TenantRepository.
 func (s tenantRepository) FindByID(id int) (*model.Tenant, error) {
-	var service model.Tenant
+	var t model.Tenant
 
-	result := s.db.Where("id = ?", id).First(&service)
+	result := s.db.Where("id = ?", id).First(&t)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &service, nil
+	return &t, nil
 }
 
 // UpdateService implements TenantRepository.
-func (s *tenantRepository) UpdateService(service *model.Tenant) error {
+func (s *tenantRepository) UpdateTenant(tenant *model.Tenant) error {
 	var r model.Tenant
 
-	result := s.db.Where("id = ?", service.ID).First(&r)
+	result := s.db.Where("id = ?", tenant.ID).First(&r)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	result = s.db.Model(&r).Updates(service)
+	result = s.db.Model(&r).Updates(tenant)
 	if result.Error != nil {
 		return result.Error
 	}

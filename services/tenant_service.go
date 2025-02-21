@@ -18,31 +18,52 @@ type tenantService struct {
 }
 
 // CreateTenant implements TenantService.
-func (*tenantService) CreateTenant(tenant *model.Tenant) error {
-	panic("unimplemented")
+func (s *tenantService) CreateTenant(tenant *model.Tenant) error {
+	result := s.tenantRepository.CreateTenant(tenant)
+	if result != nil {
+		return result
+	}
+	return nil
 }
 
 // DeleteTenant implements TenantService.
-func (*tenantService) DeleteTenant(tenant *model.Tenant) error {
-	panic("unimplemented")
+func (s *tenantService) DeleteTenant(tenant *model.Tenant) error {
+	result := s.tenantRepository.DeleteTenant(tenant)
+	if result != nil {
+		return result
+	}
+	return nil
 }
 
 // FindAll implements TenantService.
-func (*tenantService) FindAll() ([]*model.Tenant, error) {
-	panic("unimplemented")
+func (s *tenantService) FindAll() ([]*model.Tenant, error) {
+	result, err := s.tenantRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // FindByID implements TenantService.
-func (*tenantService) FindByID(id int) (*model.Tenant, error) {
-	panic("unimplemented")
+func (s *tenantService) FindByID(id int) (*model.Tenant, error) {
+	result, err := s.tenantRepository.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // UpdateTenant implements TenantService.
-func (*tenantService) UpdateTenant(tenant *model.Tenant) error {
-	panic("unimplemented")
+func (s *tenantService) UpdateTenant(tenant *model.Tenant) error {
+	err := s.tenantRepository.UpdateTenant(tenant)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
-func NewTenantRepository(tenantRepo repositories.TenantRepository) TenantService {
+func NewTenantService(tenantRepo repositories.TenantRepository) TenantService {
 	return &tenantService{
 		tenantRepository: tenantRepo,
 	}

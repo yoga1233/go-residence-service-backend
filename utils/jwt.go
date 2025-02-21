@@ -16,3 +16,9 @@ func GenerateJWT(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(config.GetEnv("JWT_SECRET_KEY", "secret")))
 }
+
+func VerifyJWT(tokenString string) (*jwt.Token, error) {
+	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.GetEnv("JWT_SECRET_KEY", "secret")), nil
+	})
+}
