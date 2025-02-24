@@ -3,8 +3,8 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/yoga1233/go-residence-service-backend/config"
+	"github.com/yoga1233/go-residence-service-backend/helper"
 	model "github.com/yoga1233/go-residence-service-backend/models"
-	"github.com/yoga1233/go-residence-service-backend/models/response"
 	"github.com/yoga1233/go-residence-service-backend/repositories"
 	service "github.com/yoga1233/go-residence-service-backend/services"
 	"github.com/yoga1233/go-residence-service-backend/utils"
@@ -20,17 +20,17 @@ func AuthRoutes(app *fiber.App) {
 	auth.Post("/register", func(c *fiber.Ctx) error {
 		user := new(model.User)
 		if err := c.BodyParser(user); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
 		}
 
 		err := utils.Validate(user)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
 		}
 		if err := authService.Register(user); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
 		}
-		return c.JSON(response.ApiResponseSuccess("user created", fiber.StatusOK, []string{}))
+		return c.JSON(helper.ApiResponseSuccess("user created", fiber.StatusOK, []string{}))
 	})
 
 	auth.Post("/login", func(c *fiber.Ctx) error {
@@ -40,19 +40,19 @@ func AuthRoutes(app *fiber.App) {
 		}
 		login := new(userRequest)
 		if err := c.BodyParser(login); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
 		}
 
 		err := utils.Validate(login)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
 		}
 
 		userResponse, err := authService.Login(login.Email, login.Password)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(response.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
 		}
-		return c.JSON(response.ApiResponseSuccess("login success", fiber.StatusOK, userResponse))
+		return c.JSON(helper.ApiResponseSuccess("login success", fiber.StatusOK, userResponse))
 	})
 
 }

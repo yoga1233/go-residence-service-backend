@@ -3,15 +3,15 @@ package service
 import (
 	"errors"
 
+	"github.com/yoga1233/go-residence-service-backend/helper"
 	model "github.com/yoga1233/go-residence-service-backend/models"
-	"github.com/yoga1233/go-residence-service-backend/models/response"
 	"github.com/yoga1233/go-residence-service-backend/repositories"
 	"github.com/yoga1233/go-residence-service-backend/utils"
 )
 
 type AuthService interface {
 	Register(user *model.User) error
-	Login(email, password string) (response.UserResponse, error)
+	Login(email, password string) (helper.UserResponse, error)
 }
 
 type authService struct {
@@ -25,25 +25,25 @@ func NewAuthService(userRepo repositories.UserRepository) AuthService {
 }
 
 // Login implements AuthService.
-func (s *authService) Login(email string, password string) (response.UserResponse, error) {
+func (s *authService) Login(email string, password string) (helper.UserResponse, error) {
 	//find user by username
 	user, err := s.userRepository.FindByEmail(email)
 	if err != nil {
-		return response.UserResponse{}, errors.New("invalid username or password")
+		return helper.UserResponse{}, errors.New("invalid username or password")
 	}
 
 	//check password
 	if !utils.CheckPasswordHash(password, user.Password) {
-		return response.UserResponse{}, errors.New("invalid username or password")
+		return helper.UserResponse{}, errors.New("invalid username or password")
 	}
 
 	//generate jwt
 	token, err := utils.GenerateJWT(email)
 	if err != nil {
-		return response.UserResponse{}, errors.New("failed to generate token")
+		return helper.UserResponse{}, errors.New("failed to generate token")
 	}
 
-	return response.UserResponse{
+	return helper.UserResponse{
 		Username: user.Username,
 		Email:    user.Email,
 		Token:    token,

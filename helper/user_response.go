@@ -1,4 +1,4 @@
-package response
+package helper
 
 type UserResponse struct {
 	Username string `json:"username"`
