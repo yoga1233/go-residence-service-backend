@@ -20,5 +20,5 @@ func main() {
 	routes.NewsRoutes(app)
 
 	log.Println("Server is running on http://localhost:3000")
-	app.Listen(":3000")
+	app.Listen("0.0.0.0:3000")
 }
