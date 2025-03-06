@@ -66,4 +66,18 @@ func TenantRoutes(app *fiber.App) {
 		return c.JSON(helper.ApiResponseSuccess("tenant updated", fiber.StatusOK, []string{}))
 	})
 
+	app.Get("/tenant/:query", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		query := c.Params("query")
+
+		r, err := tenantService.FindTenantByQuery(query)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": err.Error(),
+			})
+		}
+
+		return c.JSON(helper.ApiResponseSuccess("tenant deleted", fiber.StatusOK, r))
+
+	})
+
 }
