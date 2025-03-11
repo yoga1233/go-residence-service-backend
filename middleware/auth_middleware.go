@@ -36,6 +36,15 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		}
 	}
 
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		// Ambil email dari klaim
+		id, idOk := claims["id"].(string)
+		if idOk {
+			// Simpan email di context agar bisa diakses di handler berikutnya
+			c.Locals("id", id)
+		}
+	}
+
 	return c.Next()
 
 }

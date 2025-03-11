@@ -38,7 +38,7 @@ func (s *authService) Login(email string, password string) (helper.UserResponse,
 	}
 
 	//generate jwt
-	token, err := utils.GenerateJWT(email)
+	token, err := utils.GenerateJWT(email, int(user.ID))
 	if err != nil {
 		return helper.UserResponse{}, errors.New("failed to generate token")
 	}
