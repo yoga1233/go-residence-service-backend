@@ -1,4 +1,4 @@
-package response
+package helper
 
 type Meta struct {
 	Code    int    `json:"code"`

@@ -8,6 +8,7 @@ import (
 type TenantRepository interface {
 	FindAll() ([]*model.Tenant, error)
 	FindByID(id int) (*model.Tenant, error)
+	FindTenantByQuery(query string) ([]*model.Tenant, error)
 	CreateTenant(tenant *model.Tenant) error
 	UpdateTenant(tenant *model.Tenant) error
 	DeleteTenant(id int) error
@@ -15,6 +16,16 @@ type TenantRepository interface {
 
 type tenantRepository struct {
 	db *gorm.DB
+}
+
+// FindTenantByQuery implements TenantRepository.
+func (s *tenantRepository) FindTenantByQuery(query string) ([]*model.Tenant, error) {
+	var t []*model.Tenant
+	err := s.db.Where("name LIKE ? OR description LIKE ?", query, query).Find(&t)
+	if err != nil {
+		return nil, err.Error
+	}
+	return t, nil
 }
 
 // CreateService implements TenantRepository.

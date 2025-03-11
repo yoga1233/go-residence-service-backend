@@ -7,10 +7,11 @@ import (
 	"github.com/yoga1233/go-residence-service-backend/config"
 )
 
-func GenerateJWT(username string) (string, error) {
+func GenerateJWT(email string, id int) (string, error) {
 	claims := jwt.MapClaims{
-		"username": username,
-		"exp":      time.Now().Add(time.Hour * 1).Unix(), // Token expires in 1 hour
+		"email": email,
+		"id":    id,
+		"exp":   time.Now().Add(time.Hour * 1).Unix(), // Token expires in 1 hour
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

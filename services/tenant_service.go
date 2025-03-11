@@ -8,6 +8,7 @@ import (
 type TenantService interface {
 	FindAll() ([]*model.Tenant, error)
 	FindByID(id int) (*model.Tenant, error)
+	FindTenantByQuery(query string) ([]*model.Tenant, error)
 	CreateTenant(tenant *model.Tenant) error
 	UpdateTenant(tenant *model.Tenant) error
 	DeleteTenant(id int) error
@@ -15,6 +16,15 @@ type TenantService interface {
 
 type tenantService struct {
 	tenantRepository repositories.TenantRepository
+}
+
+// FindTenantByQuery implements TenantService.
+func (s *tenantService) FindTenantByQuery(query string) ([]*model.Tenant, error) {
+	result, err := s.tenantRepository.FindTenantByQuery(query)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // CreateTenant implements TenantService.
