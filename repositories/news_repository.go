@@ -8,6 +8,7 @@ import (
 type NewsRepository interface {
 	FindAll() ([]*model.News, error)
 	FindById(id int) (*model.News, error)
+	FindByLimit(limit int) ([]*model.News, error)
 	CreateNews(news *model.News) error
 	UpdateNews(news *model.News) error
 	DeleteNews(id int) error
@@ -15,6 +16,18 @@ type NewsRepository interface {
 
 type newsRepository struct {
 	db *gorm.DB
+}
+
+// FindByLimit implements NewsRepository.
+func (n *newsRepository) FindByLimit(limit int) ([]*model.News, error) {
+	var news []*model.News
+	result := n.db.Limit(limit).Order("updated_at DESC").Find(&news)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return news, nil
 }
 
 // CreateNews implements NewsRepository.

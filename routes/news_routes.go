@@ -38,6 +38,18 @@ func NewsRoutes(app *fiber.App) {
 		return c.JSON(helper.ApiResponseSuccess("success", fiber.StatusOK, news))
 	})
 
+	app.Get("/news/:limit", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		limit, err := strconv.Atoi(c.Params("limit"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
+		}
+		news, err := newsService.FindByLimit(limit)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+		}
+		return c.JSON(helper.ApiResponseSuccess("success", fiber.StatusOK, news))
+	})
+
 	app.Patch("/news", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
 		news := new(model.News)
 		if err := c.BodyParser(news); err != nil {

@@ -50,7 +50,7 @@ func AuthRoutes(app *fiber.App) {
 
 		userResponse, err := authService.Login(login.Email, login.Password)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+			return c.Status(fiber.StatusUnauthorized).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusUnauthorized))
 		}
 		return c.JSON(helper.ApiResponseSuccess("login success", fiber.StatusOK, userResponse))
 	})

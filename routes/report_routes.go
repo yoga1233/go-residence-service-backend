@@ -8,6 +8,7 @@ import (
 	model "github.com/yoga1233/go-residence-service-backend/models"
 	"github.com/yoga1233/go-residence-service-backend/repositories"
 	service "github.com/yoga1233/go-residence-service-backend/services"
+	"github.com/yoga1233/go-residence-service-backend/utils"
 )
 
 func ReportRoutes(app *fiber.App) {
@@ -26,14 +27,27 @@ func ReportRoutes(app *fiber.App) {
 	})
 
 	app.Post("/report", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		type ReportReq struct {
+			Title       string `json:"title" validate:"required"`
+			Description string `json:"description" validate:"required"`
+		}
 		id := c.Locals("id").(int)
+		req := new(ReportReq)
+
 		report := new(model.Report)
-		if err := c.BodyParser(report); err != nil {
+		if err := c.BodyParser(req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(
 				helper.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
 		}
 
+		valid := utils.Validate(req)
+		if valid != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(valid.Error(), fiber.StatusBadRequest))
+		}
+
 		report.UserID = uint(id)
+		report.Title = req.Title
+		report.Description = req.Title
 		err := reportService.CreateReport(report)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
