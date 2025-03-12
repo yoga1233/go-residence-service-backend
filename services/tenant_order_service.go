@@ -8,7 +8,7 @@ import (
 type TenantOrderService interface {
 	FindAll() ([]*model.TenantOrder, error)
 	FindById(id int) (*model.TenantOrder, error)
-	FindByUserID(userId int) (*model.TenantOrder, error)
+	FindByUserID(userId int) ([]*model.TenantOrder, error)
 	CreateTenantOrder(tenantOrder *model.TenantOrder) error
 	UpdateTenantOrder(tenantOrder *model.TenantOrder) error
 	DeleteTenantOrder(id int) error
@@ -19,7 +19,7 @@ type tenantOrderService struct {
 }
 
 // FindByUserID implements TenantOrderService.
-func (s *tenantOrderService) FindByUserID(userId int) (*model.TenantOrder, error) {
+func (s *tenantOrderService) FindByUserID(userId int) ([]*model.TenantOrder, error) {
 	result, err := s.tenantOrderRepository.FindByUserID(userId)
 	if err != nil {
 		return nil, err

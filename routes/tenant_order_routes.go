@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/yoga1233/go-residence-service-backend/config"
 	"github.com/yoga1233/go-residence-service-backend/helper"
@@ -17,11 +15,8 @@ func TenantOrderRoutes(app *fiber.App) {
 	tenantOrderRepo := repositories.NewTenantOrderRepository(config.DB)
 	tenantOrderService := service.NewTenantOrderService(tenantOrderRepo)
 
-	app.Get("/tenantOrder/:userId", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
-		id, err := strconv.Atoi(c.Params("userId"))
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
-		}
+	app.Get("/tenantOrder", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		id := c.Locals("id").(int)
 
 		tenantOrder, err := tenantOrderService.FindByUserID(id)
 		if err != nil {
@@ -31,10 +26,19 @@ func TenantOrderRoutes(app *fiber.App) {
 	})
 
 	app.Post("/tenantOrder", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		type Request struct {
+			TenantId int `json:"tenant_id" gorm:"not null"`
+		}
 		tenantOrder := new(model.TenantOrder)
-		if err := c.BodyParser(tenantOrder); err != nil {
+		tenantReq := new(Request)
+
+		id := c.Locals("id").(int)
+		if err := c.BodyParser(tenantReq); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
 		}
+
+		tenantOrder.UserID = id
+		tenantOrder.TenantID = tenantReq.TenantId
 
 		if err := tenantOrderService.CreateTenantOrder(tenantOrder); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("cannot create tenant order", fiber.StatusBadRequest))

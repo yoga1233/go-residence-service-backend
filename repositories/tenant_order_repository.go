@@ -8,7 +8,7 @@ import (
 type TenantOrderRepository interface {
 	FindAll() ([]*model.TenantOrder, error)
 	FindById(id int) (*model.TenantOrder, error)
-	FindByUserID(userId int) (*model.TenantOrder, error)
+	FindByUserID(userId int) ([]*model.TenantOrder, error)
 	CreateTenantOrder(tenantOrder *model.TenantOrder) error
 	UpdateTenantOrder(tenantOrder *model.TenantOrder) error
 	DeleteTenantOrder(id int) error
@@ -19,14 +19,13 @@ type tenantOrderRepository struct {
 }
 
 // FindByUserID implements TenantOrderRepository.
-func (t *tenantOrderRepository) FindByUserID(userId int) (*model.TenantOrder, error) {
-	var r model.TenantOrder
-	result := t.db.Where("user_id = ?", userId).First(&t)
+func (t *tenantOrderRepository) FindByUserID(userId int) ([]*model.TenantOrder, error) {
+	var r []*model.TenantOrder
+	result := t.db.Preload("Tenant").Where("user_id = ?", userId).Find(&r)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &r, nil
-
+	return r, nil
 }
 
 // CreateTenantOrder implements TenantOrderRepository.

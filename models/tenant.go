@@ -10,5 +10,5 @@ type Tenant struct {
 	Status      string `json:"status" gorm:"not null;type:ENUM('available', 'unavailable');default:'available'"`
 	gorm.Model
 
-	TenantOrders []TenantOrder `json:"tenant_orders" gorm:"foreignKey:TenantID"`
+	TenantOrders []TenantOrder `json:"-" gorm:"foreignKey:TenantID"`
 }

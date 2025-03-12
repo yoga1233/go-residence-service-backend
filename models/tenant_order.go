@@ -10,5 +10,5 @@ type TenantOrder struct {
 	gorm.Model
 
 	Tenant Tenant `json:"tenant" gorm:"foreignKey:TenantID;references:ID"`
-	User   User   `json:"user" gorm:"foreignKey:UserID;references:ID"`
+	User   User   `json:"-" gorm:"foreignKey:UserID;references:ID"`
 }

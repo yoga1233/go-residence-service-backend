@@ -31,18 +31,16 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		// Ambil email dari klaim
 		email, emailOk := claims["email"].(string)
 		if emailOk {
-			// Simpan email di context agar bisa diakses di handler berikutnya
+			// Store id in context so it can be accessed in the next handler
 			c.Locals("email", email)
 		}
-	}
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		// Ambil email dari klaim
-		id, idOk := claims["id"].(string)
+		idFloat, idOk := claims["id"].(float64)
 		if idOk {
-			// Simpan email di context agar bisa diakses di handler berikutnya
+			id := int(idFloat)
+			// Simpan id di context agar bisa diakses di handler berikutnya
 			c.Locals("id", id)
 		}
+
 	}
 
 	return c.Next()
