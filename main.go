@@ -19,6 +19,7 @@ func main() {
 	routes.TenantRoutes(app)
 	routes.NewsRoutes(app)
 	routes.TenantOrderRoutes(app)
+	routes.ReportRoutes(app)
 
 	log.Println("Server is running on http://localhost:3000")
 	app.Listen("0.0.0.0:3000")
