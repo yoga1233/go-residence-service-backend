@@ -1,14 +1,17 @@
 package routes
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/yoga1233/go-residence-service-backend/config"
 	"github.com/yoga1233/go-residence-service-backend/helper"
 	"github.com/yoga1233/go-residence-service-backend/middleware"
 	model "github.com/yoga1233/go-residence-service-backend/models"
 	"github.com/yoga1233/go-residence-service-backend/repositories"
 	service "github.com/yoga1233/go-residence-service-backend/services"
-	"github.com/yoga1233/go-residence-service-backend/utils"
 )
 
 func ReportRoutes(app *fiber.App) {
@@ -27,30 +30,46 @@ func ReportRoutes(app *fiber.App) {
 	})
 
 	app.Post("/report", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
-		type ReportReq struct {
-			Title       string `json:"title" validate:"required"`
-			Description string `json:"description" validate:"required"`
+		title := c.FormValue("title")
+		desc := c.FormValue("description")
+		file, err := c.FormFile("image")
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("failed to uploud image", fiber.StatusBadRequest))
 		}
+
+		if title == "" || desc == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure("Title and description cannot be empty", fiber.StatusBadRequest))
+		}
+
+		uniqueId := uuid.New()
+
+		filename := strings.Replace(uniqueId.String(), "-", "", -1)
+
+		fileExt := strings.Split(file.Filename, ".")[1]
+
+		image := fmt.Sprintf("%s.%s", filename, fileExt)
+
+		err = c.SaveFile(file, fmt.Sprintf("./images/%s", image))
+
+		if err != nil {
+
+			return c.Status(fiber.ErrBadGateway.Code).JSON(helper.ApiResponseFailure("failed to save image", fiber.ErrBadGateway.Code))
+		}
+
+		imageUrl := fmt.Sprintf("http://localhost:3000/images/%s", image)
+
 		id := c.Locals("id").(int)
-		req := new(ReportReq)
 
 		report := new(model.Report)
-		if err := c.BodyParser(req); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(
-				helper.ApiResponseFailure("invalid request", fiber.StatusBadRequest))
-		}
-
-		valid := utils.Validate(req)
-		if valid != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(valid.Error(), fiber.StatusBadRequest))
-		}
 
 		report.UserID = uint(id)
-		report.Title = req.Title
-		report.Description = req.Title
-		err := reportService.CreateReport(report)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+		report.Title = title
+		report.Description = desc
+		report.ImageUrl = imageUrl
+
+		error := reportService.CreateReport(report)
+		if error != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(error.Error(), fiber.StatusBadRequest))
 		}
 		return c.JSON(helper.ApiResponseSuccess("success", fiber.StatusOK, []string{}))
 	})

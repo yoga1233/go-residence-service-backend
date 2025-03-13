@@ -9,6 +9,7 @@ type UserRepository interface {
 	FindByUsername(username string) (*model.User, error)
 	CreateUser(user *model.User) error
 	FindByEmail(email string) (*model.User, error)
+	FindStatus(email string) (*model.User, error)
 }
 
 type userRepository struct {
@@ -19,6 +20,16 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{
 		db: db,
 	}
+}
+
+// FindStatus implements UserRepository.
+func (r *userRepository) FindStatus(email string) (*model.User, error) {
+	var user model.User
+	err := r.db.Preload("TenantOrders").Preload("Reports").Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 // CreateUser implements UserRepository.

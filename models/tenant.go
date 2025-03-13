@@ -14,5 +14,5 @@ type Tenant struct {
 	TenantCategory TenantCategory `json:"tenant_category" gorm:"foreignKey:CategoryID;references:ID"`
 
 	// Relasi ke TenantOrder
-	TenantOrders []TenantOrder `json:"tenant_orders" gorm:"foreignKey:TenantID"`
+	TenantOrders []TenantOrder `json:"-" gorm:"foreignKey:TenantID"`
 }

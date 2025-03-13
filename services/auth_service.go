@@ -12,6 +12,7 @@ import (
 type AuthService interface {
 	Register(user *model.User) error
 	Login(email, password string) (helper.UserResponse, error)
+	Status(email string) (*model.User, error)
 }
 
 type authService struct {
@@ -68,4 +69,14 @@ func (s *authService) Register(user *model.User) error {
 
 	return s.userRepository.CreateUser(user)
 
+}
+
+// Status implements AuthService.
+func (s *authService) Status(email string) (*model.User, error) {
+	result, err := s.userRepository.FindStatus(email)
+
+	if err != nil {
+		return nil, err
+	}
+	return result, err
 }

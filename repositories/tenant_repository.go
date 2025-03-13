@@ -46,7 +46,7 @@ func (s *tenantRepository) DeleteTenant(id int) error {
 // FindAll implements TenantRepository.
 func (s *tenantRepository) FindAll() ([]*model.Tenant, error) {
 	var t []*model.Tenant
-	result := s.db.Where("status = ?", "available").Find(&t).Order("id ASC")
+	result := s.db.Preload("TenantCategory").Where("status = ?", "available").Find(&t).Order("id ASC")
 	if result.Error != nil {
 		return nil, result.Error
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/yoga1233/go-residence-service-backend/config"
 	"github.com/yoga1233/go-residence-service-backend/helper"
+	"github.com/yoga1233/go-residence-service-backend/middleware"
 	model "github.com/yoga1233/go-residence-service-backend/models"
 	"github.com/yoga1233/go-residence-service-backend/repositories"
 	service "github.com/yoga1233/go-residence-service-backend/services"
@@ -53,6 +54,22 @@ func AuthRoutes(app *fiber.App) {
 			return c.Status(fiber.StatusUnauthorized).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusUnauthorized))
 		}
 		return c.JSON(helper.ApiResponseSuccess("login success", fiber.StatusOK, userResponse))
+	})
+
+	app.Get("/status", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		email := c.Locals("email").(string)
+
+		result, err := authService.Status(email)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(helper.ApiResponseFailure(err.Error(), fiber.StatusBadRequest))
+		}
+
+		return c.JSON(helper.ApiResponseSuccess("login success", fiber.StatusOK, map[string]interface{}{
+			"reports":       result.Reports,
+			"tenant_orders": result.TenantOrders,
+		}))
+
 	})
 
 }
