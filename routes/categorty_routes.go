@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/yoga1233/go-residence-service-backend/config"
-	controllers "github.com/yoga1233/go-residence-service-backend/controller"
+	"github.com/yoga1233/go-residence-service-backend/controllers"
 	"github.com/yoga1233/go-residence-service-backend/middleware"
 	"github.com/yoga1233/go-residence-service-backend/repositories"
 	service "github.com/yoga1233/go-residence-service-backend/services"
